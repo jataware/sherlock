@@ -3,7 +3,7 @@
 """
 Sherlock: Find Usernames Across Social Networks Module
 
-This module contains the main logic to search for usernames at social
+This module contains the main logic to search for usernames on social
 networks.
 """
 
@@ -19,10 +19,10 @@ import requests
 
 from requests_futures.sessions import FuturesSession
 from torrequest import TorRequest
-from result import QueryStatus
-from result import QueryResult
-from notify import QueryNotifyPrint
-from sites  import SitesInformation
+from .result import QueryStatus
+from .result import QueryResult
+from .notify import QueryNotifyPrint
+from .sites  import SitesInformation
 
 module_name = "Sherlock: Find Usernames Across Social Networks"
 __version__ = "0.14.0"
@@ -439,9 +439,7 @@ def timeout_check(value):
         raise ArgumentTypeError(f"Timeout '{value}' must be greater than 0.0s.")
     return timeout
 
-
-def main():
-
+def get_parser():
     version_string = f"%(prog)s {__version__}\n" +  \
                      f"{requests.__description__}:  {requests.__version__}\n" + \
                      f"Python:  {platform.python_version()}"
@@ -517,8 +515,11 @@ def main():
     parser.add_argument("--local", "-l",
                         action="store_true", default=False,
                         help="Force the use of the local data.json file.")
+    return parser
 
-    args = parser.parse_args()
+def main(args=None):
+    parser = get_parser()
+    args = parser.parse_args(args=args)
 
     # Check for newer version of Sherlock. If it exists, let the user know about it
     try:
@@ -534,7 +535,11 @@ def main():
     except Exception as error:
         print(f"A problem occured while checking for an update: {error}")
 
+    check_args(args)
+    site_data = make_site_data(args)
+    query_username(site_data, args)
 
+def check_args(args):
     # Argument check
     # TODO regex check on args.proxy
     if args.tor and (args.proxy is not None):
@@ -558,7 +563,7 @@ def main():
         print("You can only use --output with a single username")
         sys.exit(1)
 
-
+def make_site_data(args):
     # Create object with all information about sites we are aware of.
     try:
         if args.local:
@@ -600,7 +605,9 @@ def main():
 
         if not site_data:
             sys.exit(1)
+    return site_data
 
+def query_username(site_data, args):
     # Create notify object for query results.
     query_notify = QueryNotifyPrint(result=None,
                                     verbose=args.verbose,
@@ -669,7 +676,7 @@ def main():
                                      ]
                                     )
         print()
-
+    return results
 
 if __name__ == "__main__":
     main()
