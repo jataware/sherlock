@@ -503,11 +503,11 @@ def get_parser():
                         action="store_true", dest="no_color", default=False,
                         help="Don't color terminal output"
                         )
-    parser.add_argument("username",
-                        nargs='+', metavar='USERNAMES',
-                        action="store",
-                        help="One or more usernames to check with social networks."
-                        )
+    # parser.add_argument("username",
+    #                     nargs='+', metavar='USERNAMES',
+    #                     action="store",
+    #                     help="One or more usernames to check with social networks."
+    #                     )
     parser.add_argument("--browse", "-b",
                         action="store_true", dest="browse", default=False,
                         help="Browse to all results on default browser.")
